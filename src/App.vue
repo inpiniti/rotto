@@ -67,11 +67,11 @@
 import { ref } from "vue";
 
 const 당첨번호목록 = ref({
-  1060: [3, 10, 24, 33, 38, 45, 36],
-  1059: [7, 10, 22, 25, 34, 40, 27],
-  1058: [11, 23, 25, 30, 32, 40, 42],
-  1057: [11, 23, 25, 30, 32, 40, 42],
-  1056: [8, 13, 19, 27, 40, 45, 12],
+  //1060: [3, 10, 24, 33, 38, 45, 36],
+  //1059: [7, 10, 22, 25, 34, 40, 27],
+  //1058: [11, 23, 25, 30, 32, 40, 42],
+  //1057: [11, 23, 25, 30, 32, 40, 42],
+  //1056: [8, 13, 19, 27, 40, 45, 12],
 });
 
 const 로또 = ref([
@@ -88,11 +88,45 @@ const 로또색상변경 = () => {
           로또.value[당첨번호 - 1] - 0.6 ** (index + 1);
       });
     });
-
-  console.log("로또", 로또);
 };
 
-로또색상변경();
+const click = async () => {
+  console.log("click");
+  const data = await fetch(
+    "https://cors-anywhere.herokuapp.com/http://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=100",
+    {
+      method: "GET", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      headers: {
+        "Content-Type": "application/json",
+        origin: "x-requested-with",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    }
+  ).then((response) => {
+    if (response.ok) {
+      return response.json(); //then consume it again, the error happens
+    }
+  });
+
+  console.log("data", data);
+  당첨번호목록.value[data.drwNo] = [
+    data.drwtNo1,
+    data.drwtNo2,
+    data.drwtNo3,
+    data.drwtNo4,
+    data.drwtNo5,
+    data.drwtNo6,
+    data.bnusNo,
+  ];
+  console.log("당첨번호목록", 당첨번호목록.value);
+
+  로또색상변경();
+};
+
+click();
 
 //console.log("로또", 로또.value);
 </script>
